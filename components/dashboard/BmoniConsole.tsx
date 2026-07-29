@@ -42,24 +42,24 @@ export default function BmoniConsole() {
   };
 
   return (
-    <div className="rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-slate-900 dark:text-white font-semibold text-sm flex items-center gap-2">
-          <Terminal size={14} className="text-emerald-600 dark:text-emerald-400" />
+    <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+        <h2 className="text-slate-900 dark:text-white font-bold text-sm flex items-center gap-2">
+          <Terminal size={15} className="text-emerald-600 dark:text-emerald-400" />
           BMONI Sandbox Console
         </h2>
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
           onboarding.generalStatus === 'Onboarded'
-            ? 'text-emerald-700 dark:text-emerald-400 border-emerald-600/30 bg-emerald-600/10'
+            ? 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/50 dark:border-emerald-800'
             : onboarding.generalStatus === 'In Progress'
-            ? 'text-amber-700 dark:text-amber-400 border-amber-500/30 bg-amber-500/10'
-            : 'text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-700'
+            ? 'text-amber-800 bg-amber-50 border-amber-200 dark:text-amber-400 dark:bg-amber-950/50 dark:border-amber-800'
+            : 'text-slate-600 bg-slate-100 border-slate-200 dark:text-slate-400 dark:bg-slate-800 dark:border-slate-700'
         }`}>
           {onboarding.generalStatus}
         </span>
       </div>
 
-      <div className="space-y-3 mb-4">
+      <div className="space-y-3.5 mb-5">
         {STEPS.map((s) => {
           const done = onboarding.currentStep >= s.n;
           return (
@@ -67,17 +67,19 @@ export default function BmoniConsole() {
               <div className="mt-0.5 shrink-0">
                 {done
                   ? <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400" />
-                  : <Circle size={16} className="text-slate-300 dark:text-slate-600" />
+                  : <Circle size={16} className="text-slate-300 dark:text-slate-700" />
                 }
               </div>
-              <div className="min-w-0">
-                <p className={`text-sm font-medium ${done ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>{s.title}</p>
-                <p className="text-slate-400 dark:text-slate-600 text-xs font-mono truncate">
-                  {s.n === 1 && done ? `uid: ${onboarding.userId}` : s.endpoint}
-                </p>
+              <div className="min-w-0 flex-1">
+                <p className={`text-xs font-semibold ${done ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-400'}`}>{s.title}</p>
+                <div className="mt-1">
+                  <code className="text-[11px] font-mono text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200/80 dark:border-slate-700/80 inline-block max-w-full truncate">
+                    {s.n === 1 && done ? `uid: ${onboarding.userId}` : s.endpoint}
+                  </code>
+                </div>
                 {s.n === 2 && done && onboarding.walletAddress && (
-                  <p className="text-emerald-600 dark:text-emerald-400 text-xs font-mono truncate">
-                    {onboarding.walletAddress.slice(0, 14)}...
+                  <p className="text-emerald-600 dark:text-emerald-400 text-xs font-mono mt-0.5 truncate font-medium">
+                    {onboarding.walletAddress.slice(0, 16)}...
                   </p>
                 )}
               </div>
@@ -89,10 +91,10 @@ export default function BmoniConsole() {
       <button
         onClick={runSetup}
         disabled={loading || onboarding.generalStatus === 'Onboarded'}
-        className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+        className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
           onboarding.generalStatus === 'Onboarded'
-            ? 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-200 dark:border-slate-600'
-            : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/20'
+            ? 'bg-slate-100 text-slate-400 border border-slate-200 dark:bg-slate-800 dark:text-slate-500 dark:border-slate-700 cursor-not-allowed'
+            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 active:scale-[0.98]'
         }`}
       >
         {loading ? (
