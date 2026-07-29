@@ -16,8 +16,8 @@ export default function TransferPage() {
 
           {/* Page heading */}
           <div>
-            <h1 className="text-white font-bold text-xl mb-1">Send CNGN Transfer</h1>
-            <p className="text-slate-400 text-sm">
+            <h1 className="text-slate-900 dark:text-white font-bold text-xl mb-1">Send CNGN Transfer</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">
               GoalGuard will evaluate your transfer against active savings goals before executing on BMONI rails.
             </p>
           </div>
@@ -26,16 +26,16 @@ export default function TransferPage() {
           <ImpulsePresets />
 
           {/* Transfer form card */}
-          <div className="rounded-2xl bg-slate-900 border border-slate-700 p-6 shadow-xl">
+          <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-6 shadow-sm dark:shadow-xl">
             <div className="flex items-center gap-2 mb-5">
-              <ShieldCheck size={16} className="text-emerald-400" />
-              <h2 className="text-white font-semibold text-sm">Transfer Details</h2>
+              <ShieldCheck size={16} className="text-emerald-600 dark:text-emerald-400" />
+              <h2 className="text-slate-900 dark:text-white font-semibold text-sm">Transfer Details</h2>
             </div>
             <TransferForm />
           </div>
 
           {/* Privacy notice */}
-          <p className="text-center text-slate-600 text-xs">
+          <p className="text-center text-slate-500 dark:text-slate-600 text-xs">
             🔒 PII is anonymised before GoalGuard AI evaluation. Transaction data is never sent raw to third-party models.
           </p>
 

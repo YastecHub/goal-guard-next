@@ -26,6 +26,37 @@
   --animate-zoom-in: zoom-in 0.15s ease-out;
 }
 
+/* ── Theme Tokens ─────────────────────────────────────────────────────────── */
+/* Light mode (default) */
+:root {
+  --bg-base:        #F8FAFC;
+  --bg-surface:     #FFFFFF;
+  --bg-elevated:    #F1F5F9;
+  --bg-border:      #E2E8F0;
+  --text-primary:   #0F172A;
+  --text-secondary: #475569;
+  --text-muted:     #94A3B8;
+  --scrollbar-thumb: #CBD5E1;
+  --scrollbar-hover: #94A3B8;
+  --range-track:    #E2E8F0;
+  --range-border:   #F1F5F9;
+}
+
+/* Dark mode */
+.dark {
+  --bg-base:        #020617;
+  --bg-surface:     #0F172A;
+  --bg-elevated:    #1E293B;
+  --bg-border:      #334155;
+  --text-primary:   #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted:     #64748B;
+  --scrollbar-thumb: #334155;
+  --scrollbar-hover: #475569;
+  --range-track:    #334155;
+  --range-border:   #0F172A;
+}
+
 /* ── Base Styles ─────────────────────────────────────────────────────────── */
 * {
   box-sizing: border-box;
@@ -38,15 +69,16 @@ html {
 }
 
 body {
-  background-color: #020617; /* slate-950 */
-  color: #F8FAFC;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* ── Scrollbar ──────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: #475569; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
 
 /* ── Custom range slider ─────────────────────────────────────────────────── */
 input[type="range"] {
@@ -54,7 +86,7 @@ input[type="range"] {
   appearance: none;
   height: 6px;
   border-radius: 9999px;
-  background: #334155;
+  background: var(--range-track);
   outline: none;
 }
 input[type="range"]::-webkit-slider-thumb {
@@ -65,7 +97,7 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   background: #059669;
   cursor: pointer;
-  border: 2px solid #0F172A;
+  border: 2px solid var(--range-border);
   box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
   transition: box-shadow 0.15s ease;
 }

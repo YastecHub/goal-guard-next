@@ -61,6 +61,7 @@ interface GoalGuardStore {
 
   // UI state
   isMockMode: boolean;
+  isDarkMode: boolean;
   persona: Persona;
   pendingTransfer: PendingTransfer | null;
   isInterceptOpen: boolean;
@@ -73,6 +74,7 @@ interface GoalGuardStore {
   addTransaction: (t: Transaction) => void;
   setOnboarding: (o: OnboardingState) => void;
   setMockMode: (v: boolean) => void;
+  toggleDarkMode: () => void;
   setPersona: (p: Persona) => void;
   setPendingTransfer: (pt: PendingTransfer | null) => void;
   openIntercept: () => void;
@@ -121,6 +123,7 @@ export const useStore = create<GoalGuardStore>()(
       transactions: INITIAL_TRANSACTIONS,
       onboarding: INITIAL_ONBOARDING,
       isMockMode: true,
+      isDarkMode: false,
       persona: 'english',
       pendingTransfer: null,
       isInterceptOpen: false,
@@ -182,6 +185,7 @@ export const useStore = create<GoalGuardStore>()(
 
       setOnboarding: (o) => set({ onboarding: o }),
       setMockMode: (v) => set({ isMockMode: v }),
+      toggleDarkMode: () => set((s) => ({ isDarkMode: !s.isDarkMode })),
       setPersona: (p) => set({ persona: p }),
       setPendingTransfer: (pt) => set({ pendingTransfer: pt }),
       openIntercept: () => set({ isInterceptOpen: true }),
@@ -264,6 +268,7 @@ export const useStore = create<GoalGuardStore>()(
         transactions: s.transactions,
         onboarding: s.onboarding,
         isMockMode: s.isMockMode,
+        isDarkMode: s.isDarkMode,
         persona: s.persona,
       }),
     }

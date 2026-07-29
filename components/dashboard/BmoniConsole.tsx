@@ -42,18 +42,18 @@ export default function BmoniConsole() {
   };
 
   return (
-    <div className="rounded-2xl bg-slate-800 border border-slate-700 p-5">
+    <div className="rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-5 shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-white font-semibold text-sm flex items-center gap-2">
-          <Terminal size={14} className="text-emerald-400" />
+        <h2 className="text-slate-900 dark:text-white font-semibold text-sm flex items-center gap-2">
+          <Terminal size={14} className="text-emerald-600 dark:text-emerald-400" />
           BMONI Sandbox Console
         </h2>
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
           onboarding.generalStatus === 'Onboarded'
-            ? 'text-emerald-400 border-emerald-600/30 bg-emerald-600/10'
+            ? 'text-emerald-700 dark:text-emerald-400 border-emerald-600/30 bg-emerald-600/10'
             : onboarding.generalStatus === 'In Progress'
-            ? 'text-amber-400 border-amber-500/30 bg-amber-500/10'
-            : 'text-slate-400 border-slate-600 bg-slate-700'
+            ? 'text-amber-700 dark:text-amber-400 border-amber-500/30 bg-amber-500/10'
+            : 'text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-600 bg-slate-100 dark:bg-slate-700'
         }`}>
           {onboarding.generalStatus}
         </span>
@@ -66,17 +66,17 @@ export default function BmoniConsole() {
             <div key={s.n} className="flex items-start gap-3">
               <div className="mt-0.5 shrink-0">
                 {done
-                  ? <CheckCircle2 size={16} className="text-emerald-400" />
-                  : <Circle size={16} className="text-slate-600" />
+                  ? <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400" />
+                  : <Circle size={16} className="text-slate-300 dark:text-slate-600" />
                 }
               </div>
               <div className="min-w-0">
-                <p className={`text-sm font-medium ${done ? 'text-white' : 'text-slate-500'}`}>{s.title}</p>
-                <p className="text-slate-600 text-xs font-mono truncate">
+                <p className={`text-sm font-medium ${done ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>{s.title}</p>
+                <p className="text-slate-400 dark:text-slate-600 text-xs font-mono truncate">
                   {s.n === 1 && done ? `uid: ${onboarding.userId}` : s.endpoint}
                 </p>
                 {s.n === 2 && done && onboarding.walletAddress && (
-                  <p className="text-emerald-400 text-xs font-mono truncate">
+                  <p className="text-emerald-600 dark:text-emerald-400 text-xs font-mono truncate">
                     {onboarding.walletAddress.slice(0, 14)}...
                   </p>
                 )}
@@ -91,8 +91,8 @@ export default function BmoniConsole() {
         disabled={loading || onboarding.generalStatus === 'Onboarded'}
         className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
           onboarding.generalStatus === 'Onboarded'
-            ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
-            : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30'
+            ? 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-200 dark:border-slate-600'
+            : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/20'
         }`}
       >
         {loading ? (
