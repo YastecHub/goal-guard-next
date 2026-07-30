@@ -9,8 +9,11 @@ export default function BmoniConsole() {
   const isComplete = onboarding.generalStatus === 'Onboarded' || currentStep >= 4;
 
   const resetOnboarding = () => {
+    window.localStorage.removeItem('goalguard.userId');
+    window.localStorage.removeItem('goalguard.bmoniUserId');
     setOnboarding({
       userId: '',
+      bmoniUserId: '',
       walletAddress: '',
       kycVerified: false,
       railActive: false,

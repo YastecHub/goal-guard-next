@@ -3,8 +3,12 @@ import { useState } from 'react';
 import { useStore } from '@/lib/store';
 import { runOnboardingStep } from '@/lib/api';
 import {
-  X, CheckCircle2, Loader2, UserCheck, ShieldCheck, Wallet, ArrowRight, Sparkles, Check, ChevronLeft, Shield
+  X, CheckCircle2, Loader2, Wallet, ArrowRight, Sparkles, Check, ChevronLeft, Shield
 } from 'lucide-react';
+
+function getErrorMessage(err: unknown, fallback: string) {
+  return err instanceof Error ? err.message : fallback;
+}
 
 export default function OnboardingModal() {
   const {
@@ -23,8 +27,9 @@ export default function OnboardingModal() {
   const [error, setError] = useState('');
 
   // Step 1 Form
-  const [fullName, setFullName] = useState('Yasir Abubakar');
+  const [firstName, setFirstName] = useState('Test123456');
   const [email, setEmail] = useState('yasir@goalguard.io');
+  const [phoneNumber, setPhoneNumber] = useState('+234312364728');
 
   // Step 3 Form
   const [bvn, setBvn] = useState('22222222222');
@@ -33,18 +38,18 @@ export default function OnboardingModal() {
 
   // Handle Step 1: Create Account
   const handleStep1 = async () => {
-    if (!fullName || !email) {
-      setError('Please fill in your name and email');
+    if (!firstName || !email || !phoneNumber) {
+      setError('Please fill in your first name, email, and phone number');
       return;
     }
     setError('');
     setLoading(true);
     try {
-      const patch = await runOnboardingStep(1, isMockMode, { fullName, email });
+      const patch = await runOnboardingStep(1, isMockMode, { firstName, email, phoneNumber });
       setOnboarding({ ...onboarding, ...patch } as typeof onboarding);
       setWizardStep(2);
-    } catch (err: any) {
-      setError(err.message || 'Account creation failed');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Account creation failed'));
     } finally {
       setLoading(false);
     }
@@ -58,8 +63,8 @@ export default function OnboardingModal() {
       const patch = await runOnboardingStep(2, isMockMode);
       setOnboarding({ ...onboarding, ...patch } as typeof onboarding);
       setWizardStep(3);
-    } catch (err: any) {
-      setError(err.message || 'Smart Wallet deployment failed');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Smart Wallet deployment failed'));
     } finally {
       setLoading(false);
     }
@@ -77,8 +82,8 @@ export default function OnboardingModal() {
       const patch = await runOnboardingStep(3, isMockMode, { bvn });
       setOnboarding({ ...onboarding, ...patch } as typeof onboarding);
       setWizardStep(4);
-    } catch (err: any) {
-      setError(err.message || 'KYC verification failed');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'KYC verification failed'));
     } finally {
       setLoading(false);
     }
@@ -102,8 +107,8 @@ export default function OnboardingModal() {
         status: 'Direct Transfer',
       });
       setWizardStep(5);
-    } catch (err: any) {
-      setError(err.message || 'NGN Rail activation failed');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'NGN Rail activation failed'));
     } finally {
       setLoading(false);
     }
@@ -215,13 +220,13 @@ export default function OnboardingModal() {
 
               <div>
                 <label className="block text-slate-700 dark:text-slate-300 text-xs font-bold mb-1.5">
-                  Full Name
+                  First Name
                 </label>
                 <input
                   type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="e.g. Tunde Bakare"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="e.g. Tunde"
                   className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 font-medium"
                 />
               </div>
@@ -235,6 +240,19 @@ export default function OnboardingModal() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="e.g. user@example.com"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 font-medium"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 text-xs font-bold mb-1.5">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder="e.g. +234312364728"
                   className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 font-medium"
                 />
               </div>
@@ -264,6 +282,18 @@ export default function OnboardingModal() {
                 <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed font-medium">
                   BMONI provisions a managed smart wallet contract for instant settlement, automated savings locks, and gasless transaction handling.
                 </p>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 text-xs font-bold mb-1.5">
+                  Currency
+                </label>
+                <input
+                  type="text"
+                  value="CNGN"
+                  disabled
+                  className="w-full bg-slate-100 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-500 dark:text-slate-400 outline-none font-bold cursor-not-allowed"
+                />
               </div>
 
               {onboarding.walletAddress && (
@@ -380,6 +410,12 @@ export default function OnboardingModal() {
                 <div className="flex justify-between">
                   <span className="text-slate-500 dark:text-slate-400 font-medium">User ID:</span>
                   <span className="text-slate-900 dark:text-white font-mono font-bold">{onboarding.userId || 'usr_sandbox'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500 dark:text-slate-400 font-medium">BMONI User ID:</span>
+                  <span className="text-slate-900 dark:text-white font-mono font-bold truncate max-w-[200px]">
+                    {onboarding.bmoniUserId || 'bmoni_sandbox'}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500 dark:text-slate-400 font-medium">Wallet Address:</span>

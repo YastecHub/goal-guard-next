@@ -27,6 +27,7 @@ export interface Transaction {
 
 export interface OnboardingState {
   userId: string;
+  bmoniUserId: string;
   walletAddress: string;
   kycVerified: boolean;
   railActive: boolean;
@@ -115,6 +116,7 @@ const INITIAL_TRANSACTIONS: Transaction[] = [
 
 const INITIAL_ONBOARDING: OnboardingState = {
   userId: '',
+  bmoniUserId: '',
   walletAddress: '',
   kycVerified: false,
   railActive: false,
