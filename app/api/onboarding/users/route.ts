@@ -16,13 +16,19 @@ async function readBackendError(res: Response) {
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
+  const bmoniPayload = {
+    FirstName: body.firstName,
+    Email: body.email,
+    PhoneNumber: body.phoneNumber,
+  };
+
   let res: Response;
 
   try {
     res = await fetch(`${BMONI_API_BASE}/onboarding/users`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify(bmoniPayload),
       cache: 'no-store',
     });
   } catch {
