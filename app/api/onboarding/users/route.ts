@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BMONI_API_BASE = process.env.BMONI_API_BASE || 'http://localhost:5239/api';
+const BMONI_API_BASE = process.env.BMONI_API_BASE || 'https://goalguard.onrender.com/api';
 
 async function readBackendError(res: Response) {
   const fallback = `BMONI user creation failed with status ${res.status}`;

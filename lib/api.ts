@@ -1,7 +1,7 @@
 // lib/api.ts — GoalGuard API layer (mock engine + live backend contract)
 import { EvalResult, OnboardingState, Persona, Vault } from './store';
 
-const API_BASE = 'http://localhost:5239/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://goalguard.onrender.com/api';
 const USER_ID_STORAGE_KEY = 'goalguard.userId';
 const BMONI_USER_ID_STORAGE_KEY = 'goalguard.bmoniUserId';
 
