@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { runOnboardingStep } from '@/lib/api';
 import {
@@ -11,6 +12,7 @@ function getErrorMessage(err: unknown, fallback: string) {
 }
 
 export default function OnboardingModal() {
+  const router = useRouter();
   const {
     isOnboardingModalOpen,
     closeOnboardingModal,
@@ -116,6 +118,7 @@ export default function OnboardingModal() {
 
   const handleFinish = () => {
     closeOnboardingModal();
+    router.push('/dashboard');
   };
 
   const pct = Math.min(100, (wizardStep / 4) * 100);
