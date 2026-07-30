@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Sidebar from '@/components/layout/Sidebar';
 import InterceptModal from '@/components/modals/InterceptModal';
+import OnboardingModal from '@/components/modals/OnboardingModal';
+import CreateVaultModal from '@/components/modals/CreateVaultModal';
 import ThemeProvider from '@/components/layout/ThemeProvider';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -24,6 +26,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </div>
         <InterceptModal />
+        <OnboardingModal />
+        <CreateVaultModal />
       </body>
     </html>
   );

@@ -67,9 +67,9 @@ function VaultCard({ vault }: { vault: Vault }) {
         />
       </div>
 
-      <div className="flex items-center justify-between text-xs mb-4">
-        <span className="text-slate-900 dark:text-slate-200 font-bold text-sm">₦{vault.saved.toLocaleString()} saved</span>
-        <span className="text-slate-500 dark:text-slate-400 font-medium">target ₦{vault.target.toLocaleString()}</span>
+      <div className="flex items-center justify-between gap-2 text-xs mb-4">
+        <span className="text-slate-900 dark:text-slate-200 font-bold text-sm whitespace-nowrap">₦{vault.saved.toLocaleString()} saved</span>
+        <span className="text-slate-500 dark:text-slate-400 font-medium text-xs text-right whitespace-nowrap">of ₦{vault.target.toLocaleString()}</span>
       </div>
 
       {/* Actions */}
@@ -100,8 +100,7 @@ function VaultCard({ vault }: { vault: Vault }) {
 }
 
 export default function GoalVaultsGrid() {
-  const { vaults } = useStore();
-  const [showForm, setShowForm] = useState(false);
+  const { vaults, openCreateVault } = useStore();
 
   return (
     <div>
@@ -114,10 +113,10 @@ export default function GoalVaultsGrid() {
           </span>
         </h2>
         <button
-          onClick={() => setShowForm(!showForm)}
-          className="text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
+          onClick={openCreateVault}
+          className="text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 text-xs font-bold flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 px-3 py-1.5 rounded-xl border border-emerald-200/80 dark:border-emerald-800/80 transition-all cursor-pointer shadow-xs active:scale-[0.98]"
         >
-          + New Vault <ChevronRight size={13} className={`transition-transform ${showForm ? 'rotate-90' : ''}`} />
+          + New Vault <ChevronRight size={13} />
         </button>
       </div>
 

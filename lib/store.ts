@@ -65,10 +65,13 @@ interface GoalGuardStore {
   persona: Persona;
   pendingTransfer: PendingTransfer | null;
   isInterceptOpen: boolean;
+  isOnboardingModalOpen: boolean;
+  isCreateVaultOpen: boolean;
 
   // Actions
   setBalance: (b: number) => void;
   setVaults: (v: Vault[]) => void;
+  addVault: (name: string, target: number, days: number) => void;
   depositToVault: (vaultId: string, amount: number) => void;
   withdrawFromVault: (vaultId: string, amount: number) => void;
   addTransaction: (t: Transaction) => void;
@@ -79,6 +82,10 @@ interface GoalGuardStore {
   setPendingTransfer: (pt: PendingTransfer | null) => void;
   openIntercept: () => void;
   closeIntercept: () => void;
+  openOnboardingModal: () => void;
+  closeOnboardingModal: () => void;
+  openCreateVault: () => void;
+  closeCreateVault: () => void;
   executeAdjusted: () => void;
   executeFull: () => void;
   cancelTransfer: () => void;
@@ -127,9 +134,23 @@ export const useStore = create<GoalGuardStore>()(
       persona: 'english',
       pendingTransfer: null,
       isInterceptOpen: false,
+      isOnboardingModalOpen: false,
+      isCreateVaultOpen: false,
 
       setBalance: (b) => set({ balance: b }),
       setVaults: (v) => set({ vaults: v }),
+
+      addVault: (name, target, days) => {
+        const { vaults } = get();
+        const newVault: Vault = {
+          id: `v-${Date.now()}`,
+          name,
+          saved: 0,
+          target,
+          days,
+        };
+        set({ vaults: [...vaults, newVault] });
+      },
 
       depositToVault: (vaultId, amount) => {
         const { balance, vaults, transactions } = get();
@@ -190,6 +211,10 @@ export const useStore = create<GoalGuardStore>()(
       setPendingTransfer: (pt) => set({ pendingTransfer: pt }),
       openIntercept: () => set({ isInterceptOpen: true }),
       closeIntercept: () => set({ isInterceptOpen: false }),
+      openOnboardingModal: () => set({ isOnboardingModalOpen: true }),
+      closeOnboardingModal: () => set({ isOnboardingModalOpen: false }),
+      openCreateVault: () => set({ isCreateVaultOpen: true }),
+      closeCreateVault: () => set({ isCreateVaultOpen: false }),
 
       executeAdjusted: () => {
         const { pendingTransfer, balance, transactions } = get();

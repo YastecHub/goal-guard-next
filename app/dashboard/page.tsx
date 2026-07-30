@@ -3,6 +3,7 @@ import BalanceCard from '@/components/dashboard/BalanceCard';
 import GoalVaultsGrid from '@/components/dashboard/GoalVaultsGrid';
 import TransactionFeed from '@/components/dashboard/TransactionFeed';
 import BmoniConsole from '@/components/dashboard/BmoniConsole';
+import OnboardingHeroBanner from '@/components/dashboard/OnboardingHeroBanner';
 
 export const metadata = {
   title: 'Dashboard — GoalGuard',
@@ -13,6 +14,9 @@ export default function DashboardPage() {
     <>
       <Header title="Dashboard" />
       <main className="flex-1 p-6 lg:p-8 max-w-7xl mx-auto w-full bg-slate-50/60 dark:bg-slate-950/50 min-h-[calc(100vh-3.5rem)]">
+        {/* Prominent Onboarding Callout when user is not onboarded */}
+        <OnboardingHeroBanner />
+
         <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6">
 
           {/* Left column */}

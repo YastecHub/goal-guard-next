@@ -9,7 +9,8 @@ const CATEGORIES = ['General Transfer', 'Entertainment', 'Business', 'Shopping',
 
 export default function TransferForm() {
   const router = useRouter();
-  const { vaults, persona, isMockMode, setPendingTransfer, openIntercept } = useStore();
+  const { vaults, persona, isMockMode, setPendingTransfer, openIntercept, onboarding, openOnboardingModal } = useStore();
+  const isComplete = onboarding.generalStatus === 'Onboarded' || onboarding.currentStep >= 4;
 
   const [form, setForm] = useState({
     recipientAddress: '',
@@ -31,6 +32,10 @@ export default function TransferForm() {
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
+      if (!isComplete) {
+        openOnboardingModal();
+        return;
+      }
       const amount = parseFloat(form.amount);
       if (!amount || amount < 100) {
         setError('Minimum transfer amount is ₦100');
@@ -65,11 +70,29 @@ export default function TransferForm() {
         setLoading(false);
       }
     },
-    [form, vaults, persona, isMockMode, setPendingTransfer, openIntercept]
+    [form, vaults, persona, isMockMode, setPendingTransfer, openIntercept, isComplete, openOnboardingModal]
   );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {!isComplete && (
+        <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl space-y-2">
+          <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold text-xs">
+            <ShieldCheck size={16} className="text-amber-600 dark:text-amber-400" />
+            BMONI Wallet Onboarding Required First
+          </div>
+          <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">
+            You must complete your 4-step BMONI account setup before sending CNGN transfers.
+          </p>
+          <button
+            type="button"
+            onClick={openOnboardingModal}
+            className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-3 rounded-lg text-xs transition-all cursor-pointer shadow-xs active:scale-[0.98]"
+          >
+            🚀 Complete Onboarding Now
+          </button>
+        </div>
+      )}
       {/* Recipient Address */}
       <div>
         <label className="block text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">

@@ -100,10 +100,11 @@ export async function handleExecuteTransfer(payload: ExecutePayload): Promise<{ 
 
 export async function runOnboardingStep(
   stepNumber: number,
-  isMockMode: boolean
+  isMockMode: boolean,
+  payload?: Record<string, any>
 ): Promise<Partial<OnboardingState>> {
   if (isMockMode) {
-    await new Promise((r) => setTimeout(r, 700));
+    await new Promise((r) => setTimeout(r, 600));
     if (stepNumber === 1)
       return { userId: 'usr_' + Math.random().toString(36).slice(2, 11), currentStep: 1, generalStatus: 'In Progress' };
     if (stepNumber === 2)
@@ -117,7 +118,7 @@ export async function runOnboardingStep(
   const res = await fetch(`${API_BASE}/onboarding/setup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ step: stepNumber }),
+    body: JSON.stringify({ step: stepNumber, ...payload }),
   });
   if (!res.ok) throw new Error(`Onboarding step ${stepNumber} failed`);
   return res.json();
