@@ -6,6 +6,7 @@ import InterceptModal from '@/components/modals/InterceptModal';
 import OnboardingModal from '@/components/modals/OnboardingModal';
 import CreateVaultModal from '@/components/modals/CreateVaultModal';
 import ThemeProvider from '@/components/layout/ThemeProvider';
+import { Analytics } from '@vercel/analytics/next';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <InterceptModal />
         <OnboardingModal />
         <CreateVaultModal />
+        <Analytics />
       </body>
     </html>
   );
