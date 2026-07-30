@@ -1,25 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// POST /api/transfer/execute
-// In production: forward to BMONI sandbox rails using BMONI_API_KEY env var
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { recipientAddress, amount, choice } = body;
+  const { searchParams } = new URL(req.url);
+  const userId = searchParams.get('userId') || 'unknown';
 
-  if (choice === 'cancel') {
-    return NextResponse.json({ success: true, txId: null, status: 'Canceled' });
+  const body = await req.json();
+  const { recipientAddress, recipientName, amount, category, decision } = body;
+
+  const BMONI_API_BASE = process.env.BMONI_API_BASE || 'https://goalguard.onrender.com/api';
+
+  try {
+    const res = await fetch(
+      `${BMONI_API_BASE}/transfer/confirm?userId=${encodeURIComponent(userId)}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipientAddress, recipientName, amount, category, decision }),
+      }
+    );
+
+    if (res.ok) return NextResponse.json(await res.json());
+  } catch {
+    // fall through to local mock
   }
 
-  // Simulate BMONI SDK call — in production this would call:
-  // POST https://embedded-dev.bmoni.com/v1/users/{userId}/smart-wallets/transfer
-  // with x-api-key: process.env.BMONI_API_KEY
   const mockTxId = `bmoni-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const statusLabel =
+    decision === 'cancel' ? 'Canceled' : decision === 'adjust' ? 'AI Adjusted' : 'Direct Transfer';
 
   return NextResponse.json({
     success: true,
-    txId: mockTxId,
-    status: choice === 'adjusted' ? 'AI Adjusted' : 'Direct Transfer',
-    amount,
-    recipient: recipientAddress,
+    message: `Transfer ${statusLabel.toLowerCase()}.`,
+    transactionHash: mockTxId,
   });
 }

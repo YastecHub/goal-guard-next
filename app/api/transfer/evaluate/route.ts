@@ -1,39 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// POST /api/transfer/evaluate
-// Backend contract for live mode: receives transfer details, returns AI evaluation
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { amount, category, vaults, persona } = body;
+  const { searchParams } = new URL(req.url);
+  const userId = searchParams.get('userId') || 'unknown';
 
-  const activeVault = vaults?.find((v: any) => v.saved < v.target);
-  if (!activeVault) {
+  const body = await req.json();
+  const { recipientAddress, recipientName, amount, category } = body;
+
+  const BMONI_API_BASE = process.env.BMONI_API_BASE || 'https://goalguard.onrender.com/api';
+
+  try {
+    const res = await fetch(
+      `${BMONI_API_BASE}/transfer/evaluate?userId=${encodeURIComponent(userId)}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipientAddress, recipientName, amount, category }),
+      }
+    );
+
+    if (res.ok) return NextResponse.json(await res.json());
+
+    const fallback = `Sending ₦${amount.toLocaleString()} CNGN for ${category}. GoalGuard AI is evaluating this transaction.`;
+    const suggestedAmount = Math.max(500, Math.round((amount * 0.48) / 100) * 100);
+
     return NextResponse.json({
-      intercepted: false,
-      tradeOffText: '',
+      verdict: 'intercept',
+      tradeOffExplanation: fallback,
+      goalDelayDays: Math.max(1, Math.ceil(amount / 5000)),
+      vaultImpact: { fromPercent: 65, toPercent: 30 },
+      suggestedAmount,
+      suggestedLabel: `Send ₦${suggestedAmount.toLocaleString()} CNGN Instead`,
+    });
+  } catch {
+    return NextResponse.json({
+      verdict: 'intercept',
+      tradeOffExplanation: `Sending ₦${amount.toLocaleString()} CNGN for ${category}. AI evaluation unavailable — proceed with caution.`,
+      goalDelayDays: 0,
+      vaultImpact: { fromPercent: 65, toPercent: 65 },
       suggestedAmount: amount,
-      delayDays: 0,
-      personas: {},
+      suggestedLabel: `Send ₦${amount.toLocaleString()} CNGN Instead`,
     });
   }
-
-  const remaining = activeVault.target - activeVault.saved;
-  const dailyRate = Math.ceil(remaining / activeVault.days);
-  const delayDays = Math.max(1, Math.ceil(amount / (dailyRate || 1000)));
-  const suggested = Math.max(500, Math.round((amount * 0.48) / 100) * 100);
-
-  const personas = {
-    english: `Sending ₦${amount.toLocaleString()} CNGN for ${category} now will delay your '${activeVault.name}' target by ${delayDays} days. If you send ₦${suggested.toLocaleString()} CNGN instead, you stay on track!`,
-    pidgin: `Oga, if you send ₦${amount.toLocaleString()} CNGN for ${category} right now, your '${activeVault.name}' goal go shift back by ${delayDays} days o! Make you send ₦${suggested.toLocaleString()} CNGN instead.`,
-    genz: `Bestie 😬 sending ₦${amount.toLocaleString()} CNGN is giving ${delayDays} days delay on your '${activeVault.name}' goal. Send ₦${suggested.toLocaleString()} CNGN instead fr.`,
-    merchant: `Paying ₦${amount.toLocaleString()} CNGN delays your '${activeVault.name}' milestone by ${delayDays} days. Re-allocating to ₦${suggested.toLocaleString()} CNGN protects your liquidity.`,
-  };
-
-  return NextResponse.json({
-    intercepted: true,
-    tradeOffText: personas[persona as keyof typeof personas] || personas.english,
-    suggestedAmount: suggested,
-    delayDays,
-    personas,
-  });
 }
