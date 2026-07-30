@@ -36,11 +36,12 @@ export interface OnboardingState {
 }
 
 export interface EvalResult {
-  intercepted: boolean;
-  tradeOffText: string;
+  verdict: 'allow' | 'intercept' | 'block';
+  tradeOffExplanation: string;
+  goalDelayDays: number;
+  vaultImpact: { fromPercent: number; toPercent: number };
   suggestedAmount: number;
-  delayDays: number;
-  personas: Record<Persona, string>;
+  suggestedLabel: string;
 }
 
 export interface PendingTransfer {

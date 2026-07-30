@@ -1,100 +1,50 @@
-// lib/api.ts — GoalGuard API layer (mock engine + live backend contract)
-import { EvalResult, OnboardingState, Persona, Vault } from './store';
+// lib/api.ts — GoalGuard API layer (backend contract)
+import { OnboardingState } from './store';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '/api';
 const USER_ID_STORAGE_KEY = 'goalguard.userId';
 const BMONI_USER_ID_STORAGE_KEY = 'goalguard.bmoniUserId';
 
-// ─── Mock Helpers ─────────────────────────────────────────────────────────────
-
-function buildPersonas(
-  amount: number,
-  category: string,
-  vaultName: string,
-  delayDays: number,
-  suggested: number
-): Record<Persona, string> {
-  return {
-    english: `Sending ₦${amount.toLocaleString()} CNGN for ${category} now will delay your '${vaultName}' target by ${delayDays} days. If you send ₦${suggested.toLocaleString()} CNGN instead, you stay on track for your target date!`,
-    pidgin: `Oga/Madam, if you send ₦${amount.toLocaleString()} CNGN for ${category} right now, your '${vaultName}' goal go shift back by ${delayDays} days o! Make you send ₦${suggested.toLocaleString()} CNGN instead — your money go stay safe.`,
-    genz: `Bestie 😬 sending ₦${amount.toLocaleString()} CNGN is giving ${delayDays} days delay on your '${vaultName}' goal. Send ₦${suggested.toLocaleString()} CNGN instead and keep the bag secured fr.`,
-    merchant: `Paying ₦${amount.toLocaleString()} CNGN from operating capital delays your '${vaultName}' milestone by ${delayDays} days. Re-allocating to ₦${suggested.toLocaleString()} CNGN preserves your liquidity position.`,
-  };
-}
-
 // ─── Evaluate Transfer ────────────────────────────────────────────────────────
 
-export interface EvaluatePayload {
-  amount: number;
-  category: string;
-  recipientAddress: string;
-  recipientName: string;
-  vaults: Vault[];
-  persona: Persona;
-  isMockMode: boolean;
-}
-
-export async function handleEvaluateTransfer(payload: EvaluatePayload): Promise<EvalResult> {
-  if (payload.isMockMode) {
-    await new Promise((r) => setTimeout(r, 800)); // simulate AI latency
-
-    const activeVault = payload.vaults.find((v) => v.saved < v.target);
-    if (!activeVault) {
-      return {
-        intercepted: false,
-        tradeOffText: '',
-        suggestedAmount: payload.amount,
-        delayDays: 0,
-        personas: buildPersonas(payload.amount, payload.category, 'Vault', 0, payload.amount),
-      };
-    }
-
-    const remaining = activeVault.target - activeVault.saved;
-    const dailyRate = Math.ceil(remaining / activeVault.days);
-    const delayDays = Math.max(1, Math.ceil(payload.amount / (dailyRate || 1000)));
-    const suggested = Math.max(500, Math.round((payload.amount * 0.48) / 100) * 100);
-    const personas = buildPersonas(payload.amount, payload.category, activeVault.name, delayDays, suggested);
-
-    return {
-      intercepted: true,
-      tradeOffText: personas[payload.persona],
-      suggestedAmount: suggested,
-      delayDays,
-      personas,
-    };
-  }
-
-  const res = await fetch(`${API_BASE}/transfer/evaluate`, {
+export async function evaluateTransfer(
+  userId: string,
+  payload: { recipientAddress: string; recipientName: string; amount: number; category: string }
+): Promise<{
+  verdict: 'allow' | 'intercept' | 'block';
+  tradeOffExplanation: string;
+  goalDelayDays: number;
+  vaultImpact: { fromPercent: number; toPercent: number };
+  suggestedAmount: number;
+  suggestedLabel: string;
+}> {
+  const res = await fetch(`${API_BASE}/transfer/evaluate?userId=${encodeURIComponent(userId)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error('Evaluation failed');
+  if (!res.ok) throw new Error(await getApiErrorMessage(res, 'Evaluation failed'));
   return res.json();
 }
 
-// ─── Execute Transfer ─────────────────────────────────────────────────────────
+// ─── Confirm Transfer ─────────────────────────────────────────────────────────
 
-export interface ExecutePayload {
-  recipientAddress: string;
-  recipientName: string;
-  amount: number;
-  category: string;
-  choice: 'adjusted' | 'full' | 'cancel';
-  isMockMode: boolean;
-}
-
-export async function handleExecuteTransfer(payload: ExecutePayload): Promise<{ success: boolean; txId: string }> {
-  if (payload.isMockMode) {
-    await new Promise((r) => setTimeout(r, 400));
-    return { success: true, txId: `mock-tx-${Date.now()}` };
+export async function confirmTransfer(
+  userId: string,
+  payload: {
+    recipientAddress: string;
+    recipientName: string;
+    amount: number;
+    category: string;
+    decision: 'proceed' | 'adjust' | 'cancel';
   }
-  const res = await fetch(`${API_BASE}/transfer/execute`, {
+): Promise<{ success: boolean; message: string; transactionHash: string }> {
+  const res = await fetch(`${API_BASE}/transfer/confirm?userId=${encodeURIComponent(userId)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error('Transfer execution failed');
+  if (!res.ok) throw new Error(await getApiErrorMessage(res, 'Transfer confirmation failed'));
   return res.json();
 }
 

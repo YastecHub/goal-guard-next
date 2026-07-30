@@ -1,6 +1,6 @@
 'use client';
 import { useStore } from '@/lib/store';
-import { handleEvaluateTransfer } from '@/lib/api';
+import { evaluateTransfer } from '@/lib/api';
 import { Zap } from 'lucide-react';
 import { useState } from 'react';
 
@@ -11,21 +11,20 @@ const PRESETS = [
 ];
 
 export default function ImpulsePresets() {
-  const { vaults, persona, isMockMode, setPendingTransfer, openIntercept } = useStore();
+  const { onboarding, setPendingTransfer, openIntercept } = useStore();
   const [loading, setLoading] = useState<number | null>(null);
+  const [error, setError] = useState('');
 
   const trigger = async (idx: number) => {
     const p = PRESETS[idx];
     setLoading(idx);
+    setError('');
     try {
-      const evalResult = await handleEvaluateTransfer({
+      const evalResult = await evaluateTransfer(onboarding.userId, {
         amount: p.amount,
         category: p.category,
         recipientAddress: p.address,
         recipientName: p.recipient,
-        vaults,
-        persona,
-        isMockMode,
       });
       setPendingTransfer({
         recipientAddress: p.address,
@@ -35,6 +34,8 @@ export default function ImpulsePresets() {
         evalResult,
       });
       openIntercept();
+    } catch (err: any) {
+      setError(err.message || 'Evaluation failed');
     } finally {
       setLoading(null);
     }
@@ -50,6 +51,11 @@ export default function ImpulsePresets() {
         </span>
       </div>
       <p className="text-slate-500 dark:text-slate-400 text-xs mb-4">Click to instantly test GoalGuard's AI friction copilot:</p>
+      {error && (
+        <p className="mb-3 text-xs font-semibold text-rose-600 bg-rose-50 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg px-3 py-2">
+          {error}
+        </p>
+      )}
       <div className="flex gap-3 flex-wrap">
         {PRESETS.map((p, i) => (
           <button

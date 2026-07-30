@@ -2,14 +2,14 @@
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
-import { handleEvaluateTransfer } from '@/lib/api';
+import { evaluateTransfer } from '@/lib/api';
 import { Loader2, Send, ShieldCheck } from 'lucide-react';
 
 const CATEGORIES = ['General Transfer', 'Entertainment', 'Business', 'Shopping', 'Food & Dining', 'Education'];
 
 export default function TransferForm() {
   const router = useRouter();
-  const { vaults, persona, isMockMode, setPendingTransfer, openIntercept, onboarding, openOnboardingModal } = useStore();
+  const { onboarding, setPendingTransfer, openIntercept, openOnboardingModal } = useStore();
   const isComplete = onboarding.generalStatus === 'Onboarded' || onboarding.currentStep >= 4;
 
   const [form, setForm] = useState({
@@ -26,7 +26,6 @@ export default function TransferForm() {
 
   const prefill = (data: Partial<typeof form>) => setForm((f) => ({ ...f, ...data }));
 
-  // expose prefill so ImpulsePresets can call it
   (TransferForm as any)._prefill = prefill;
 
   const handleSubmit = useCallback(
@@ -45,14 +44,11 @@ export default function TransferForm() {
       setLoading(true);
 
       try {
-        const evalResult = await handleEvaluateTransfer({
+        const evalResult = await evaluateTransfer(onboarding.userId, {
           amount,
           category: form.category,
           recipientAddress: form.recipientAddress,
           recipientName: form.recipientName,
-          vaults,
-          persona,
-          isMockMode,
         });
 
         setPendingTransfer({
@@ -70,7 +66,7 @@ export default function TransferForm() {
         setLoading(false);
       }
     },
-    [form, vaults, persona, isMockMode, setPendingTransfer, openIntercept, isComplete, openOnboardingModal]
+    [form, onboarding.userId, setPendingTransfer, openIntercept, isComplete, openOnboardingModal]
   );
 
   return (
@@ -178,7 +174,7 @@ export default function TransferForm() {
         {loading ? (
           <>
             <Loader2 size={16} className="animate-spin" />
-            Querying GoalGuard AI Engine & BMONI Ledger...
+            Evaluating with GoalGuard AI...
           </>
         ) : (
           <>
